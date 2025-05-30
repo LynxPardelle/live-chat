@@ -144,7 +144,7 @@ class SocketService {
 
 ### Fase 3: Chat UI
 1. Implementar ChatWindow layout
-2. MessageList con datos mock
+2. MessageList con datos mock (Opcionalmente desde API)
 3. MessageInput básico
 
 ### Fase 4: Socket.io Integration
