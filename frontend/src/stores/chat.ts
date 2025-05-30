@@ -114,15 +114,23 @@ export const useChatStore = defineStore('chat', {
 
       // Handle chat history
       socketService.onChatHistory((data: { messages: any[]; count: number }) => {
-        console.log('Chat history received:', data.messages.length, 'messages')
-        // Transform messages from server format to client format
-        const messages = data.messages.map((msg: any) => ({
-          id: msg._id || msg.id,
-          username: msg.username,
-          content: msg.content,
-          timestamp: new Date(msg.timestamp || msg.createdAt),
-        }))
-        this.setMessages(messages)
+        try {
+          console.log('Data received:', data)
+          if (!data || !Array.isArray(data.messages)) {
+            throw new Error('Invalid chat history format')
+          }
+          console.log('Chat history received:', data.messages.length, 'messages')
+          // Transform messages from server format to client format
+          const messages = data.messages.map((msg: any) => ({
+            id: msg._id || msg.id,
+            username: msg.username,
+            content: msg.content,
+            timestamp: new Date(msg.timestamp || msg.createdAt),
+          }))
+          this.setMessages(messages)
+        } catch (error: any) {
+          console.error('Failed to process chat history:', error)
+        }
       })
 
       // Handle incoming messages
@@ -187,6 +195,73 @@ export const useChatStore = defineStore('chat', {
         console.error('Failed to load history:', error)
       } finally {
         this.setLoading(false)
+      }
+    },
+
+    // Load recent messages for new users joining
+    async loadRecentMessages(limit: number = 20) {
+      this.setLoading(true)
+      try {
+        const { default: apiService } = await import('@/services/api')
+        const messages = await apiService.getRecentMessages(limit)
+        this.setMessages(messages)
+        console.log('Recent messages loaded:', messages.length, 'messages')
+      } catch (error: any) {
+        console.error('Failed to load recent messages:', error)
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    // Get database statistics
+    async getStatistics() {
+      try {
+        const { default: apiService } = await import('@/services/api')
+        const stats = await apiService.getStatistics()
+        console.log('Database statistics:', stats)
+        return stats
+      } catch (error: any) {
+        console.error('Failed to get statistics:', error)
+        return { totalMessages: 0 }
+      }
+    },
+
+    // Get message by ID
+    async getMessageById(messageId: string) {
+      try {
+        const { default: apiService } = await import('@/services/api')
+        const message = await apiService.getMessageById(messageId)
+        console.log('Message retrieved:', message)
+        return message
+      } catch (error: any) {
+        console.error('Failed to get message by ID:', error)
+        return null
+      }
+    },
+
+    // Check API health
+    async checkApiHealth() {
+      try {
+        const { default: apiService } = await import('@/services/api')
+        const isHealthy = await apiService.healthCheck()
+        console.log('API health check:', isHealthy ? 'OK' : 'FAILED')
+        return isHealthy
+      } catch (error: any) {
+        console.error('Failed to check API health:', error)
+        return false
+      }
+    },
+
+    // Get API information
+    async getApiInfo() {
+      try {
+        const { default: apiService } = await import('@/services/api')
+        const info = await apiService.getApiInfo()
+        console.log('API info:', info)
+        return info
+      } catch (error: any) {
+        console.error('Failed to get API info:', error)
+        return null
       }
     },
 

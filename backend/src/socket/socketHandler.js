@@ -77,8 +77,8 @@ function initializeSocketHandlers(io) {
         try {
           const recentMessages = await messageService.getRecentMessages(20);
           socket.emit("chat-history", {
-            messages: recentMessages.data,
-            count: recentMessages.count,
+            messages: recentMessages,
+            count: recentMessages.length,
           });
         } catch (error) {
           console.error("❌ Error fetching chat history:", error.message);

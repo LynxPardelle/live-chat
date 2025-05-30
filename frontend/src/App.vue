@@ -1,21 +1,35 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useChatStore } from '@/stores/chat'
 import LoginForm from '@/components/LoginForm.vue'
 import ChatWindow from '@/components/chat/ChatWindow.vue'
 
+const route = useRoute()
 const chatStore = useChatStore()
+
+// Check if we're on a router-based view (like admin)
+const isRouterView = computed(() => {
+  return route.path !== '/' || route.name !== 'home'
+})
 
 // Computed to determine which component to show
 const currentComponent = computed(() => {
+  // If we're on a router view, show RouterView
+  if (isRouterView.value) {
+    return null // RouterView will be shown in template
+  }
+  // Otherwise, show chat or login based on auth state
   return chatStore.isLoggedIn ? ChatWindow : LoginForm
 })
 </script>
 
 <template>
-  <div id="app">
-    <component :is="currentComponent" />
-  </div>
+  <!-- Show RouterView for router-based navigation -->
+  <RouterView v-if="isRouterView" />
+
+  <!-- Show chat application for main functionality -->
+  <component v-else :is="currentComponent" />
 </template>
 
 <style>

@@ -11,6 +11,7 @@
           <span class="status-indicator"></span>
           {{ connectionStatusText }}
         </div>
+        <button @click="openAdminPanel" class="admin-button">Admin</button>
         <button @click="handleLogout" class="logout-button">Logout</button>
       </div>
     </header>
@@ -29,10 +30,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useChatStore } from '@/stores/chat'
 import MessageList from './MessageList.vue'
 import MessageInput from './MessageInput.vue'
 
+const router = useRouter()
 const chatStore = useChatStore()
 
 // Computed properties
@@ -50,6 +53,10 @@ const handleLogout = () => {
   if (confirm('Are you sure you want to leave the chat?')) {
     chatStore.clearUser()
   }
+}
+
+const openAdminPanel = () => {
+  router.push('/admin')
 }
 </script>
 
@@ -138,6 +145,21 @@ const handleLogout = () => {
 
 .logout-button:hover {
   background: #c82333;
+}
+
+.admin-button {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.admin-button:hover {
+  background: #545b62;
 }
 
 /* Content */
